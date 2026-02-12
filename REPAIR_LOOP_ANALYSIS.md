@@ -141,7 +141,6 @@ python intervenor.py \
 
 ## Backward Compatibility with Original INTERVENOR
 
-**Your implementation strictly follows the original INTERVENOR workflow and is fully backward compatible.**
 
 ### **Original 3-Step Process (Static)**
 ```
@@ -161,7 +160,7 @@ python intervenor.py \
    evaluate_functional_correctness {result_path}
 ```
 
-### **Your Interactive Repair Loop (Dynamic)**
+### **Interactive Repair Loop (Dynamic)**
 ```
 Interactive Loop = A⁰ + Loop[B → C → A^i]
 
@@ -177,7 +176,7 @@ python intervenor.py --todo interactive_repair --max_turn N
 
 ### **Key Differences**
 
-| Aspect | Original | Your Implementation |
+| Aspect | Original | New Implementation |
 |--------|----------|---------------------|
 | **Execution Model** | Manual, sequential | Automated, looped |
 | **File Management** | Overwrites (single turn) | Traceable (multi-turn) |
@@ -195,7 +194,7 @@ evaluate_functional_correctness ./results/code_generation/humaneval/python.jsonl
 python intervenor.py --todo cor_generation
 python intervenor.py --todo code_repair
 
-# Your interactive loop (new feature)
+# New interactive loop (new feature)
 python intervenor.py --todo interactive_repair --max_turn 3
 ```
 
@@ -263,31 +262,8 @@ When running `python intervenor.py --todo interactive_repair --max_turn N`, resu
 │
 └── turn_N_repaired.jsonl_results.jsonl  # Final results after N turns
 ```
-
-**File Flow**:
-1. `turn_i_repaired.jsonl` is automatically fed to Stage B of Turn i+1
-2. `turn_i_repaired.jsonl_results.jsonl` contains error messages for Turn i+1's Stage C
-3. All intermediate files are retained for traceability and analysis
-4. No files are overwritten during multi-turn execution
-
 ---
 
-## ✅ Paper Compliance Checklist
-
-| Component | Implementation | Status |
-|---|---|---|
-| **Stage A⁰** | `code_generation()` | ✅ |
-| **Stage B** (Test + error collection) | `evaluate_functional_correctness` | ✅ |
-| **Stage C** (Feedback generation) | `cor_generation()` (Code Teacher) | ✅ |
-| **Stage A^i** (Repair with feedback) | `code_reapiring()` with CoR input | ✅ |
-| **Loop control** (`max_turn`) | `--max_turn` CLI parameter | ✅ |
-| **Auto-chaining** | `gen_path = repaired_path` | ✅ |
-| **Feedback propagation** | Error messages + textual guidance | ✅ |
-| **Traceable outputs** | Separate files per turn | ✅ |
-
-**Compliance Level: 100%** ✓
-
----
 
 ## 📚 References
 
@@ -301,15 +277,4 @@ When running `python intervenor.py --todo interactive_repair --max_turn N`, resu
 **Benchmark Dataset**:
 - HumanEval: https://github.com/openai/human-eval
 
----
 
-## ✨ Summary
-
-The INTERVENOR Repair Loop implementation enables **interactive code repair through iterative feedback**. Unlike simple retry logic:
-
-- **Feedback-Driven**: Each iteration uses textual guidance from Code Teacher
-- **Error-Aware**: Previous failures inform subsequent repair attempts
-- **Traceable**: All intermediate results are preserved in separate files
-- **Flexible**: `--max_turn` enables research-friendly ablation studies (1, 3, 5, etc. turns)
-
-**Status**: ✅ Fully implemented and compliant with ACL 2024 paper specification.
