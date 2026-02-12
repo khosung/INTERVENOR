@@ -1,17 +1,19 @@
 import backoff
-import openai
+from openai import OpenAI, APIError, APIConnectionError, RateLimitError, APITimeoutError
 import os
 import numpy as np
 # os.environ["http_proxy"]="127.0.0.1:7890"
 # os.environ["https_proxy"]="127.0.0.1:7890"
-# openai.api_key = "Put your API key here"
 
-# api_list = [
-# "Put your API key1 here",
-# "Put your API key2 here"
-# ...
-# ]
+# Set API key from environment variable
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    raise ValueError("OPENAI_API_KEY environment variable not set. Please set it before running.")
+
+# Support for multiple API keys (optional)
+api_list = [api_key] + [k.strip() for k in os.getenv("OPENAI_API_KEYS", "").split(",") if k.strip()]
 api_nums = len(api_list)
+
 class GPTAgent():
     def __init__(self, model):
         """
@@ -19,17 +21,14 @@ class GPTAgent():
         """
         self.model = model
 
-
     @backoff.on_exception(
         backoff.fibo,
         # https://platform.openai.com/docs/guides/error-codes/python-library-error-types
         (
-            openai.error.APIError,
-            openai.error.Timeout,
-            openai.error.RateLimitError,
-            openai.error.ServiceUnavailableError,
-            openai.error.APIConnectionError,
-            KeyError,
+            APIError,
+            APIConnectionError,
+            RateLimitError,
+            APITimeoutError,
         ),
     )
     def __call__(self, user_prompt, max_tokens, temperature, stop_words):
@@ -41,9 +40,18 @@ class GPTAgent():
         :return: Return the response and the usage of the model.
         """
         api_key = api_list[np.random.randint(0, api_nums)]
-        openai.api_key = api_key
-        response = openai.Completion.create(engine=self.model, prompt=user_prompt, max_tokens=max_tokens, temperature=temperature,
-                                 stop=stop_words)
-        return response.choices[0].text, response["usage"]
+        client = OpenAI(api_key=api_key)
+        response = client.completions.create(
+            model=self.model,
+            prompt=user_prompt,
+            max_tokens=max_tokens,
+            temperature=temperature,
+            stop=stop_words
+        )
+        return response.choices[0].text, {
+            "prompt_tokens": response.usage.prompt_tokens,
+            "completion_tokens": response.usage.completion_tokens,
+            "total_tokens": response.usage.total_tokens
+        }
 
 
