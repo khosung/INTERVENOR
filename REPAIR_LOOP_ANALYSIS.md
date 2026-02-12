@@ -11,7 +11,7 @@ Original Repository: https://github.com/NEUIR/INTERVENOR
 
 ---
 
-## � My Modifications (Task 3 Compliance)
+## My Modifications (Task 3 Compliance)
 
 In accordance with the project requirements, I have transformed the static execution flow into a dynamic feedback-driven loop with flexible turn control.
 
@@ -80,7 +80,7 @@ When `save_path` is not provided, functions use default paths (backward compatib
 
 ---
 
-## 🚀 How to Run
+## How to Run
 
 ### **Setup**
 ```bash
@@ -139,7 +139,7 @@ python intervenor.py \
 
 ---
 
-## ✅ Backward Compatibility with Original INTERVENOR
+## Backward Compatibility with Original INTERVENOR
 
 **Your implementation strictly follows the original INTERVENOR workflow and is fully backward compatible.**
 
